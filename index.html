@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BİSMİL</title>
+    <link rel="icon" href="https://i.hizliresim.com/hurvvgm.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { user-select: none; -webkit-user-select: none; -moz-user-select: none; }
+        body {
+            background-color: #020408;
+            color: #ccc;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            background-image: linear-gradient(rgba(0, 5, 10, 0.88), rgba(0, 15, 25, 0.95)), url('https://i.hizliresim.com/hurvvgm.png');
+            background-size: 100% 100%, 180px 180px; 
+            background-repeat: no-repeat, repeat;
+            background-attachment: fixed, fixed;
+            animation: slideBg 20s linear infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-transform: uppercase;
+            overflow-x: hidden;
+        }
+        @keyframes slideBg { 0% { background-position: center, 0px 0px; } 100% { background-position: center, -360px -360px; } }
+        .view-section { display: flex; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s ease-in-out; }
+        .hidden { display: none !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MÜZİK ÇALAR (SAĞ ÜST) */
+        .player-topright { position: fixed; top: 25px; right: 30px; z-index: 1000; }
+        .custom-player {
+            display: flex; align-items: center; gap: 15px; background: rgba(0, 5, 10, 0.7);
+            border: 1px solid #00e5ff; padding: 10px 20px; border-radius: 25px; width: 180px; backdrop-filter: blur(8px);
+        }
+        .custom-player button { background: transparent; border: none; color: #00e5ff; font-size: 20px; cursor: pointer; outline: none; }
+        .progress-bar-bg { flex-grow: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #00e5ff; width: 0%; transition: width 0.1s linear; }
+
+        /* KAKASHİ & BALONCUK (SOL ORTA) */
+        .kakashi-sidebar { position: fixed; left: 50px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 1000; }
+        .floating-kakashi { width: 80px; height: 80px; object-fit: cover; mix-blend-mode: screen; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        .speech-bubble {
+            background: #050811; border: 2px solid #00e5ff; border-radius: 12px; padding: 15px 20px; color: #fff;
+            font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.8; width: 220px; position: relative; text-transform: lowercase; text-align: left;
+        }
+        .speech-bubble::before { content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); border-width: 0 10px 12px 10px; border-style: solid; border-color: transparent transparent #00e5ff transparent; }
+
+        /* KULLANICI GİRİŞ (LOGIN) EKRANI */
+        .login-container { margin-top: 25vh; display: flex; flex-direction: column; align-items: center; background: rgba(0, 5, 10, 0.85); border: 2px solid #00e5ff; padding: 40px; border-radius: 8px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); backdrop-filter: blur(10px); }
+        .login-title { color: #00e5ff; font-size: 32px; letter-spacing: 10px; margin-bottom: 25px; font-weight: 700; text-shadow: 0 0 15px rgba(0, 229, 255, 0.5); }
+        .login-input { background: rgba(0, 0, 0, 0.6); border: 1px solid #00e5ff; color: #fff; padding: 15px 20px; font-size: 20px; font-family: 'Rajdhani'; text-align: center; outline: none; margin-bottom: 20px; border-radius: 4px; letter-spacing: 2px; width: 250px; }
+        .login-input:focus { box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+        .login-btn { background: #00e5ff; color: #000; border: none; padding: 12px 40px; font-size: 20px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 4px; transition: 0.2s; }
+        .login-btn:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+
+        /* ANA MENÜ TASARIMI */
+        .main-menu-content { margin-top: 5vh; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        h1 { color: #00e5ff; font-size: 55px; margin: 0; letter-spacing: 25px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); font-weight: 700; }
+        .welcome-title { color: #fff; font-size: 20px; letter-spacing: 8px; margin-bottom: 20px; }
+        
+        /* ROZET (BADGE) TASARIMI */
+        .user-welcome { 
+            background: rgba(0, 229, 255, 0.1); 
+            border: 1px solid #00e5ff; 
+            color: #00e5ff; 
+            padding: 8px 25px; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            letter-spacing: 4px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); 
+        }
+
+        /* HİYERARŞİ */
+        .hierarchy-title { color: #00e5ff; font-size: 16px; letter-spacing: 5px; margin-bottom: 10px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 5px; }
+        .kurucu-wrap { display: flex; justify-content: center; margin-bottom: 20px; width: 100%; }
+        .gang-wrap { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; width: 100%; }
+        .gang-link { text-decoration: none; outline: none; }
+        
+        .m-card { background: rgba(5, 10, 15, 0.65); border: 1px solid #00e5ff; padding: 6px; width: 85px; text-align: center; border-radius: 4px; transition: 0.3s; cursor: pointer; }
+        .m-card img { width: 75px; height: 75px; object-fit: cover; border-radius: 2px; transition: 0.3s; filter: grayscale(30%) brightness(75%); }
+        .m-card span { display: block; font-size: 14px; margin-top: 6px; color: #00e5ff; font-weight: 700; letter-spacing: 1px; transition: 0.3s; }
+        .m-card:hover { border-color: #fff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.6); transform: translateY(-5px); }
+        .m-card:hover img { border-color: #00e5ff; filter: grayscale(0%) brightness(110%); }
+        .m-card:hover span { color: #fff; text-shadow: 0 0 10px #00e5ff; }
+        
+        .kurucu-card { width: 110px; border-color: #ffd700; }
+        .kurucu-card img { width: 100px; height: 100px; border-color: #ffd700; }
+        .kurucu-card span { font-size: 18px; color: #ffd700; }
+        .kurucu-card:hover { border-color: #fff; box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+        .kurucu-card:hover img { border-color: #fff; }
+        .kurucu-card:hover span { color: #fff; text-shadow: 0 0 15px #ffd700; }
+
+        /* OYUN BUTONLARI */
+        .menu-btns { display: flex; gap: 20px; margin-bottom: 40px; }
+        .menu-btn { background: rgba(0, 10, 20, 0.8); border: 2px solid #00e5ff; color: #fff; padding: 15px 40px; font-size: 18px; cursor: pointer; font-family: 'Rajdhani'; font-weight: 700; letter-spacing: 3px; transition: 0.2s; }
+        .menu-btn:hover { background: #00e5ff; color: #000; box-shadow: 0 0 25px rgba(0, 229, 255, 0.6); transform: translateY(-3px); }
+        .btn-gold { border-color: #ffd700; color: #ffd700; }
+        .btn-gold:hover { background: #ffd700; color: #000; box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+
+        .wiki-link { color: #00e5ff; background: rgba(0, 5, 10, 0.6); border: 1px solid #00e5ff; padding: 10px 30px; text-decoration: none; border-radius: 3px; font-weight: 700; letter-spacing: 2px; transition: 0.2s; }
+        .wiki-link:hover { background: #00e5ff; color: #000; box-shadow: 0 0 20px rgba(0, 229, 255, 0.8); transform: scale(1.05); }
+
+        .scoreboard-container { width: 750px; background: rgba(0, 5, 10, 0.7); border: 1px solid #ffd700; padding: 30px; border-radius: 8px; text-align: center; }
+        .back-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 8px 20px; cursor: pointer; margin-top: 20px; font-family: 'Rajdhani'; transition: 0.2s; margin-bottom: 20px; }
+        .back-btn:hover { border-color: #00e5ff; color: #00e5ff; }
+
+        /* OYUN ALANLARI CSS */
+        .bj-table { background: rgba(5, 10, 15, 0.85); border: 1px solid #00e5ff; width: 500px; padding: 25px; border-radius: 8px; text-align: center; }
+        .bj-header { font-size: 18px; color: #aaa; font-weight: 700; margin-bottom: 15px; }
+        .bj-area { border: 1px solid rgba(0, 229, 255, 0.3); padding: 15px; margin-bottom: 20px; position: relative; background: rgba(0,0,0,0.6); }
+        .bj-area .label { position: absolute; top: -10px; left: 15px; background: #02050a; padding: 0 10px; color: #00e5ff; font-size: 12px; }
+        .score { font-size: 38px; font-weight: 700; color: #fff; margin-top: 10px; }
+        .chip-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+        .chip { width: 42px; height: 42px; border: 2px solid; cursor: pointer; line-height: 42px; font-size: 14px; font-weight: 700; text-align: center; border-radius: 50%; }
+        .c5 { border-color: #555; color: #888; } .c10 { border-color: #007bb5; color: #007bb5; } .c50 { border-color: #00e5ff; color: #00e5ff; } .c100 { border-color: #a020f0; color: #a020f0; } .c500 { border-color: #ff003c; color: #ff003c; } .c1k { border-color: #ffd700; color: #ffd700; } .c5k { border-color: #fff; color: #fff; }
+        .bj-actions { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .action-btn { background: transparent; color: #fff; border: 1px solid; padding: 10px 25px; cursor: pointer; font-weight: 700; font-family: 'Rajdhani'; }
+        .action-btn:disabled { border-color: #222; color: #444; cursor: not-allowed; }
+
+        .game-panel { background: rgba(5, 10, 15, 0.85); border: 1px solid #00e5ff; padding: 15px; border-radius: 4px; text-align: center; }
+        .game-canvas { background: #000; border: 1px solid #00e5ff; display: block; margin: 0 auto; cursor: crosshair; }
+        .start-btn { background: #00e5ff; color: #000; border: none; padding: 10px 30px; cursor: pointer; font-weight: 700; font-family: 'Rajdhani'; margin-top: 15px; }
+
+        /* LİDERLİK TABLOSU SATIRLARI */
+        .score-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+        .score-row span:first-child { text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="player-topright">
+        <div class="custom-player">
+            <button id="play-btn" onclick="togglePlay()">▶</button>
+            <div class="progress-bar-bg" onclick="seek(event)"><div class="progress-bar-fill" id="progress-fill"></div></div>
+            <button onclick="sonrakineGec()">⏭</button>
+        </div>
+        <audio id="main-audio"></audio>
+    </div>
+
+    <div class="kakashi-sidebar">
+        <img src="https://i.hizliresim.com/hurvvgm.png" class="floating-kakashi">
+        <div class="speech-bubble"><span id="lyrics-text">sistem aktif...</span><span class="cursor-blink"></span></div>
+    </div>
+
+    <div id="view-login" class="view-section">
+        <div class="login-container">
+            <div class="login-title">BİSMİL LOGİN</div>
+            <input type="text" id="username-input" class="login-input" placeholder="NİCKNAME GİRİN" maxlength="12" onkeypress="handleEnter(event)">
+            <button class="login-btn" onclick="login()">GİRİŞ YAP</button>
+        </div>
+    </div>
+
+    <div id="view-menu" class="view-section hidden">
+        <div class="main-menu-content">
+            <h1>BİSMİL</h1>
+            <div class="welcome-title">WELCOME TO BİSMİL</div>
+            <div id="user-display" class="user-welcome"></div>
+            
+            <div class="hierarchy-title">KURUCU</div>
+            <div class="kurucu-wrap">
+                <a href="https://www.instagram.com/yyoungtoven/" target="_blank" class="gang-link">
+                    <div class="m-card kurucu-card">
+                        <img src="https://i.hizliresim.com/hurvvgm.png">
+                        <span>SQREEX</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="hierarchy-title">GANG</div>
+            <div class="gang-wrap">
+                <a href="https://www.instagram.com/s4lihxlw/" target="_blank" class="gang-link">
+                    <div class="m-card"><img src="https://i.hizliresim.com/t3z1dmp.jfif"><span>S1WASH</span></div>
+                </a>
+                <a href="https://www.instagram.com/batim_dnc/" target="_blank" class="gang-link">
+                    <div class="m-card"><img src="https://i.hizliresim.com/gf3w8f4.jpg"><span>JAMPI</span></div>
+                </a>
+                <a href="https://www.instagram.com/mustafaw.kc/" target="_blank" class="gang-link">
+                    <div class="m-card"><img src="https://i.hizliresim.com/4l2hiop.jpg"><span>SLEYR</span></div>
+                </a>
+            </div>
+
+            <div class="menu-btns">
+                <button class="menu-btn" onclick="openGame('bj')">BLACKJACK</button>
+                <button class="menu-btn" onclick="openGame('zed')">ZED RUN</button>
+                <button class="menu-btn" onclick="openGame('aim')">AİM LAB</button>
+                <button class="menu-btn btn-gold" onclick="openGame('score')">LİDERLİK TABLOSU</button>
+            </div>
+            
+            <a href="https://sites.google.com/view/diyarbakrbismil/ana-sayfa" target="_blank" class="wiki-link">WIKIPEDIA'YA GİT</a>
+        </div>
+    </div>
+
+    <div id="view-score" class="view-section hidden">
+        <button class="back-btn" onclick="goHome()">MENÜYE DÖN</button>
+        <div class="scoreboard-container">
+            <h2 style="color:#ffd700; letter-spacing: 5px;">LİDERLİK TABLOSU</h2>
+            <div style="display:flex; justify-content: space-around; text-align: left;">
+                
+                <div style="color:#ccc; font-size:18px; width: 300px;">
+                    <h3 style="color:#fff; text-align:center; border-bottom:1px solid #555; padding-bottom:10px;">ZED RUN</h3>
+                    <div class="score-row" style="color:#00e5ff; font-weight:700; background:rgba(0,229,255,0.1); padding:5px; border-radius:3px;">
+                        <span>1. <span id="board-name-zed">MİSAFİR</span></span>
+                        <span id="max-zed-score">0</span>
+                    </div>
+                    <div class="score-row"><span>2. S1WASH</span><span>120</span></div>
+                    <div class="score-row"><span>3. JAMPI</span><span>80</span></div>
+                    <div class="score-row"><span>4. SLEYR</span><span>50</span></div>
+                </div>
+
+                <div style="color:#ccc; font-size:18px; width: 300px;">
+                    <h3 style="color:#fff; text-align:center; border-bottom:1px solid #555; padding-bottom:10px;">AİM LAB</h3>
+                    <div class="score-row" style="color:#00e5ff; font-weight:700; background:rgba(0,229,255,0.1); padding:5px; border-radius:3px;">
+                        <span>1. <span id="board-name-aim">MİSAFİR</span></span>
+                        <span id="max-aim-score">0</span>
+                    </div>
+                    <div class="score-row"><span>2. S1WASH</span><span>24</span></div>
+                    <div class="score-row"><span>3. JAMPI</span><span>18</span></div>
+                    <div class="score-row"><span>4. SLEYR</span><span>15</span></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="view-bj" class="view-section hidden">
+        <button class="back-btn" onclick="goHome()">MENÜYE DÖN</button>
+        <div class="bj-table">
+            <div class="bj-header">KASA: <span id="kasa" style="color:#fff;">5000</span></div>
+            <div class="bj-area">
+                <div class="label">KURPİYER (SHEN)</div>
+                <div id="d-puan" class="score">?</div>
+            </div>
+            <div id="mesaj" style="color:#00e5ff; font-weight:700; margin-bottom:15px; height: 20px;">BAHİS KOY VE BAŞLA</div>
+            <div class="bj-area" style="border-color:#ffd700;">
+                <div class="label" style="color:#ffd700; border-color:#ffd700;" id="bj-player-name">OYUNCU</div>
+                <div id="p-puan" class="score">0</div>
+            </div>
+            <div class="bj-header">BAHİS: <span id="bahis" style="color:#00e5ff;">0</span></div>
+            <div class="chip-container">
+                <div class="chip c5" onclick="bahisEkle(5)">5</div>
+                <div class="chip c10" onclick="bahisEkle(10)">10</div>
+                <div class="chip c50" onclick="bahisEkle(50)">50</div>
+                <div class="chip c100" onclick="bahisEkle(100)">100</div>
+                <div class="chip c500" onclick="bahisEkle(500)">500</div>
+                <div class="chip c1k" onclick="bahisEkle(1000)">1K</div>
+                <div class="chip c5k" onclick="bahisEkle(5000)">5K</div>
+            </div>
+            <div class="bj-actions">
+                <button id="btn-dagit" class="action-btn" style="border-color:#00e5ff; color:#00e5ff;" onclick="dagit()">DAĞIT</button>
+                <button class="action-btn" style="border-color:#555; color:#888;" onclick="bahisTemizle()">SİL</button>
+                <button id="btn-cek" class="action-btn" style="border-color:#ffd700; color:#ffd700;" onclick="cek()" disabled>KART ÇEK</button>
+                <button id="btn-dur" class="action-btn" style="border-color:#555; color:#888;" onclick="dur()" disabled>DUR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-zed" class="view-section hidden">
+        <button class="back-btn" onclick="goHome()">MENÜYE DÖN</button>
+        <div class="game-panel" style="width: 340px;">
+            <h3 style="color:#00e5ff; margin-top:0;">ZED RUN (WASD)</h3>
+            <canvas id="oyun" class="game-canvas" width="310" height="240"></canvas>
+            <div style="font-size: 18px; margin-top: 12px; color: #888; font-weight: 700;">SKOR: <span id="skor" style="color:#fff;">0</span></div>
+        </div>
+    </div>
+
+    <div id="view-aim" class="view-section hidden">
+        <button class="back-btn" onclick="goHome()">MENÜYE DÖN</button>
+        <div class="game-panel" style="width: 500px; max-width: 95%;">
+            <h3 style="color:#00e5ff; margin-top:0;">AİM LAB</h3>
+            <canvas id="aim-canvas" class="game-canvas" width="460" height="300"></canvas>
+            <div style="display: flex; justify-content: space-around; font-size: 18px; margin-top: 12px; color: #888; font-weight: 700;">
+                <div>SKOR: <span id="aim-score" style="color:#fff;">0</span></div>
+                <div>SÜRE: <span id="aim-time" style="color:#fff;">30</span> sn</div>
+            </div>
+            <button class="start-btn" onclick="startAimGame()">BAŞLA</button>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL KULLANICI DEĞİŞKENLERİ
+        let currentUser = "MİSAFİR";
+        window.maxZed = 0;
+        window.maxAim = 0;
+
+        // LOGIN SİSTEMİ
+        function login() {
+            let inputVal = document.getElementById("username-input").value.trim().toUpperCase();
+            if(inputVal === "") return; 
+            
+            currentUser = inputVal;
+            
+            document.getElementById("user-display").innerText = currentUser; 
+            document.getElementById("board-name-zed").innerText = currentUser;
+            document.getElementById("board-name-aim").innerText = currentUser;
+            document.getElementById("bj-player-name").innerText = currentUser;
+
+            document.getElementById("view-login").classList.add("hidden");
+            document.getElementById("view-menu").classList.remove("hidden");
+            
+            if(player.paused) { sarkiYukle(); player.play().catch(()=>{}); document.getElementById('play-btn').innerText = "⏸"; }
+        }
+
+        function handleEnter(e) { if(e.key === 'Enter') login(); }
+
+        function openGame(g) { 
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-'+g).classList.remove('hidden'); 
+            if(g === 'aim') drawAimGrid();
+        }
+        function goHome() { 
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-menu').classList.remove('hidden'); 
+        }
+
+        // --- TONY MONTANA REPLİKLERİ ---
+        const montanaQuotes = [
+            "the eyes chico, they never lie.",
+            "say hello to my little friend!",
+            "i always tell the truth. even when i lie.",
+            "who put this thing together? me, that's who.",
+            "the world, chico, and everything in it.",
+            "every dog has his day."
+        ];
+        
+        let quoteIndex = 0;
+        const lyricsText = document.getElementById('lyrics-text');
+        
+        setInterval(() => {
+            quoteIndex = (quoteIndex + 1) % montanaQuotes.length;
+            lyricsText.innerText = montanaQuotes[quoteIndex];
+        }, 5000); 
+
+        // --- MÜZİK SİSTEMİ (SADECE DOSYALAR) ---
+        const sarkiData = ["1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3", "9.mp3", "10.mp3", "11.mp3", "12.mp3"];
+        let sarkiSirasi = [];
+        let aktifSira = 0;
+        const player = document.getElementById('main-audio');
+
+        function listeyiKaristir() {
+            sarkiSirasi = Array.from({length: sarkiData.length}, (_, i) => i).sort(() => Math.random() - 0.5);
+            aktifSira = 0;
+        }
+
+        function sarkiYukle() { player.src = sarkiData[sarkiSirasi[aktifSira]]; }
+
+        function sonrakineGec() {
+            aktifSira++;
+            if (aktifSira >= sarkiSirasi.length) listeyiKaristir();
+            sarkiYukle();
+            player.play().catch(() => {});
+        }
+
+        player.onended = sonrakineGec;
+        player.onerror = () => { setTimeout(sonrakineGec, 1000); };
+
+        function togglePlay() {
+            if (player.paused) { if(!player.src) sarkiYukle(); player.play(); document.getElementById('play-btn').innerText = "⏸"; }
+            else { player.pause(); document.getElementById('play-btn').innerText = "▶"; }
+        }
+        
+        player.addEventListener('timeupdate', () => {
+            if(player.duration) {
+                const percent = (player.currentTime / player.duration) * 100;
+                document.getElementById('progress-fill').style.width = percent + '%';
+            }
+        });
+
+        function seek(e) {
+            const bg = e.currentTarget;
+            player.currentTime = (e.offsetX / bg.clientWidth) * player.duration;
+        }
+
+        listeyiKaristir();
+
+        // --- BLACKJACK MOTORU ---
+        let kasa = 5000, bahis = 0, pPuan = 0, dPuan = 0, oynuyor = false;
+        function bahisEkle(miktar) { if (!oynuyor && kasa >= miktar) { bahis += miktar; kasa -= miktar; uiGuncelle(); } }
+        function bahisTemizle() { if (!oynuyor) { kasa += bahis; bahis = 0; uiGuncelle(); } }
+        function uiGuncelle() { 
+            document.getElementById('kasa').innerText = kasa; 
+            document.getElementById('bahis').innerText = bahis; 
+            document.getElementById('p-puan').innerText = pPuan; 
+            document.getElementById('d-puan').innerText = oynuyor ? dPuan : "?"; 
+        }
+        function dagit() {
+            if (bahis === 0) { document.getElementById('mesaj').innerText = "ÖNCE BAHİS KOY!"; return; }
+            document.getElementById('mesaj').innerText = "";
+            oynuyor = true; pPuan = Math.floor(Math.random() * 11) + 11; dPuan = Math.floor(Math.random() * 9) + 8;
+            butonlariAyarla(true); uiGuncelle();
+        }
+        function cek() {
+            pPuan += Math.floor(Math.random() * 10) + 1; uiGuncelle();
+            if (pPuan > 21) bitir("PATLADIN! KASA ALDI.");
+        }
+        function dur() {
+            while (dPuan < 17) dPuan += Math.floor(Math.random() * 10) + 1;
+            uiGuncelle();
+            if (dPuan > 21 || pPuan > dPuan) { kasa += bahis * 2; bitir("KAZANDIN!"); }
+            else if (pPuan === dPuan) { kasa += bahis; bitir("BERABERE!"); }
+            else { bitir("KASA ALDI!"); }
+        }
+        function butonlariAyarla(durum) { 
+            document.getElementById('btn-dagit').disabled = durum; document.getElementById('btn-cek').disabled = !durum; document.getElementById('btn-dur').disabled = !durum; 
+        }
+        function bitir(metin) { 
+            document.getElementById('mesaj').innerText = metin; oynuyor = false; bahis = 0; butonlariAyarla(false); 
+            setTimeout(() => {
+                if(!oynuyor) { 
+                    pPuan = 0; dPuan = 0; 
+                    if (kasa <= 0) { kasa = 5000; document.getElementById('mesaj').innerText = "İFLAS! YENİLENDİ."; } 
+                    else { document.getElementById('mesaj').innerText = "YENİ BAHİS KOY"; }
+                    uiGuncelle(); 
+                }
+            }, 2000); 
+        }
+
+        // --- ZED RUN MOTORU (RİOT API) ---
+        const canvas = document.getElementById("oyun");
+        const ctx = canvas.getContext("2d");
+        let zSkor = 0;
+        let zed = { x: 140, y: 110, w: 26, h: 26, hiz: 4.5 };
+        let shens = [{ x: 20, y: 20, dx: 2, dy: 2 }]; 
+        let item = { x: 100, y: 100, w: 24, h: 24, img: null };
+        let tuslar = {};
+
+        const imgMap = new Image(); const imgZed = new Image(); const imgShen = new Image();
+        const assassinItemIDs = ["3142", "3814", "3179", "6676", "3134", "6692", "6694", "6695", "6696"];
+        const lolItemImages = assassinItemIDs.map(() => new Image());
+
+        fetch("https://ddragon.leagueoflegends.com/api/versions.json")
+            .then(res => res.json())
+            .then(data => {
+                let v = data[0]; 
+                imgMap.src = `https://ddragon.leagueoflegends.com/cdn/${v}/img/map/map11.png`;
+                imgZed.src = `https://ddragon.leagueoflegends.com/cdn/${v}/img/champion/Zed.png`;
+                imgShen.src = `https://ddragon.leagueoflegends.com/cdn/${v}/img/champion/Shen.png`;
+                lolItemImages.forEach((img, i) => { img.src = `https://ddragon.leagueoflegends.com/cdn/${v}/img/item/${assassinItemIDs[i]}.png`; });
+            });
+
+        window.addEventListener("keydown", e => { tuslar[e.key.toLowerCase()] = true; });
+        window.addEventListener("keyup", e => { tuslar[e.key.toLowerCase()] = false; });
+
+        function itemYerlestir() {
+            item.x = 15 + Math.random() * (canvas.width - 40);
+            item.y = 15 + Math.random() * (canvas.height - 40);
+            item.img = lolItemImages[Math.floor(Math.random() * lolItemImages.length)];
+        }
+
+        function oyunDöngüsü() {
+            if(!document.getElementById('view-zed').classList.contains('hidden')) {
+                if (tuslar['w'] && zed.y > 0) zed.y -= zed.hiz;
+                if (tuslar['s'] && zed.y < canvas.height - zed.h) zed.y += zed.hiz;
+                if (tuslar['a'] && zed.x > 0) zed.x -= zed.hiz;
+                if (tuslar['d'] && zed.x < canvas.width - zed.w) zed.x += zed.hiz;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if(imgMap.complete && imgMap.naturalWidth > 0) { ctx.drawImage(imgMap, 0, 0, canvas.width, canvas.height); } 
+                else { ctx.fillStyle = "#111"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+                ctx.fillStyle = "rgba(0, 0, 0, 0.75)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (item.img && item.img.complete && item.img.naturalWidth > 0) { ctx.drawImage(item.img, item.x, item.y, item.w, item.h); } 
+                else { ctx.fillStyle = "#00e5ff"; ctx.fillRect(item.x, item.y, item.w, item.h); }
+
+                if (imgZed.complete && imgZed.naturalWidth > 0) { ctx.drawImage(imgZed, zed.x, zed.y, zed.w, zed.h); } 
+                else { ctx.fillStyle = "#fff"; ctx.fillRect(zed.x, zed.y, zed.w, zed.h); }
+
+                shens.forEach(s => {
+                    s.x += s.dx; s.y += s.dy;
+                    if (s.x <= 0 || s.x >= canvas.width - zed.w) s.dx *= -1;
+                    if (s.y <= 0 || s.y >= canvas.height - zed.h) s.dy *= -1;
+
+                    if (imgShen.complete && imgShen.naturalWidth > 0) { ctx.drawImage(imgShen, s.x, s.y, zed.w, zed.h); } 
+                    else { ctx.fillStyle = "#ff0000"; ctx.fillRect(s.x, s.y, zed.w, zed.h); }
+
+                    if (zed.x < s.x + zed.w && zed.x + zed.w > s.x && zed.y < s.y + zed.h && zed.y + zed.h > s.y) {
+                        zSkor = 0; zed.x = 140; zed.y = 110; document.getElementById("skor").innerText = zSkor;
+                    }
+                });
+
+                if (zed.x < item.x + item.w && zed.x + zed.w > item.x && zed.y < item.y + item.h && zed.y + zed.h > item.y) {
+                    zSkor += 10; document.getElementById("skor").innerText = zSkor; 
+                    itemYerlestir();
+                    if(zSkor > window.maxZed) { window.maxZed = zSkor; document.getElementById("max-zed-score").innerText = window.maxZed; }
+                }
+            }
+            requestAnimationFrame(oyunDöngüsü);
+        }
+        itemYerlestir(); oyunDöngüsü();
+
+        // --- AİM LAB MOTORU ---
+        const aimCanvas = document.getElementById("aim-canvas");
+        const aimCtx = aimCanvas.getContext("2d");
+        let aimScore = 0, aimTime = 30, aimActive = false, aimInterval, currentTarget = null;
+
+        function drawAimGrid() {
+            aimCtx.clearRect(0, 0, aimCanvas.width, aimCanvas.height);
+            if (aimActive && currentTarget) {
+                aimCtx.beginPath(); aimCtx.arc(currentTarget.x, currentTarget.y, currentTarget.r, 0, Math.PI * 2);
+                aimCtx.fillStyle = "#00e5ff"; aimCtx.fill(); aimCtx.lineWidth = 2; aimCtx.strokeStyle = "#fff"; aimCtx.stroke();
+                aimCtx.beginPath(); aimCtx.arc(currentTarget.x, currentTarget.y, 3, 0, Math.PI * 2);
+                aimCtx.fillStyle = "#ff003c"; aimCtx.fill();
+            } else if (!aimActive && aimTime <= 0) {
+                aimCtx.fillStyle = "rgba(0, 0, 0, 0.85)"; aimCtx.fillRect(0, 0, aimCanvas.width, aimCanvas.height);
+                aimCtx.fillStyle = "#ff003c"; aimCtx.font = "bold 38px Rajdhani"; aimCtx.textAlign = "center";
+                aimCtx.fillText("SÜRE BİTTİ!", aimCanvas.width/2, aimCanvas.height/2 - 15);
+                aimCtx.fillStyle = "#fff"; aimCtx.font = "bold 26px Rajdhani";
+                aimCtx.fillText("SKORUN: " + aimScore, aimCanvas.width/2, aimCanvas.height/2 + 25);
+            } else if (!aimActive) {
+                aimCtx.fillStyle = "rgba(0, 229, 255, 0.2)"; aimCtx.font = "bold 24px Rajdhani"; aimCtx.textAlign = "center";
+                aimCtx.fillText("BAŞLAMAK İÇİN BUTONA BAS", aimCanvas.width/2, aimCanvas.height/2);
+            }
+        }
+
+        function spawnAimTarget() {
+            const radius = 15; 
+            currentTarget = { x: radius + Math.random() * (aimCanvas.width - radius * 2), y: radius + Math.random() * (aimCanvas.height - radius * 2), r: radius };
+            drawAimGrid();
+        }
+
+        function startAimGame() {
+            if (aimActive) return; 
+            aimScore = 0; aimTime = 30; aimActive = true;
+            document.getElementById("aim-score").innerText = aimScore; document.getElementById("aim-time").innerText = aimTime;
+            spawnAimTarget();
+            aimInterval = setInterval(() => {
+                aimTime--; document.getElementById("aim-time").innerText = aimTime;
+                if (aimTime <= 0) { clearInterval(aimInterval); aimActive = false; currentTarget = null; drawAimGrid(); }
+            }, 1000);
+        }
+
+        aimCanvas.addEventListener('mousedown', (e) => {
+            if (!aimActive || !currentTarget) return;
+            const rect = aimCanvas.getBoundingClientRect();
+            const distance = Math.hypot((e.clientX - rect.left) - currentTarget.x, (e.clientY - rect.top) - currentTarget.y);
+            if (distance <= currentTarget.r + 5) { 
+                aimScore++; document.getElementById("aim-score").innerText = aimScore; spawnAimTarget();
+                if(aimScore > window.maxAim) { window.maxAim = aimScore; document.getElementById("max-aim-score").innerText = window.maxAim; }
+            }
+        });
+    </script>
+</body>
+</html>
