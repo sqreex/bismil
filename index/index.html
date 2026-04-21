@@ -61,21 +61,7 @@
         /* ANA MENÜ TASARIMI */
         .main-menu-content { margin-top: 5vh; display: flex; flex-direction: column; align-items: center; width: 100%; }
         h1 { color: #00e5ff; font-size: 55px; margin: 0; letter-spacing: 25px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); font-weight: 700; }
-        .welcome-title { color: #fff; font-size: 20px; letter-spacing: 8px; margin-bottom: 20px; }
-        
-        /* ROZET (BADGE) TASARIMI */
-        .user-welcome { 
-            background: rgba(0, 229, 255, 0.1); 
-            border: 1px solid #00e5ff; 
-            color: #00e5ff; 
-            padding: 8px 25px; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            font-weight: 700; 
-            letter-spacing: 4px; 
-            margin-bottom: 30px; 
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); 
-        }
+        .welcome-title { color: #fff; font-size: 20px; letter-spacing: 8px; margin-bottom: 40px; }
 
         /* HİYERARŞİ */
         .hierarchy-title { color: #00e5ff; font-size: 16px; letter-spacing: 5px; margin-bottom: 10px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 5px; }
@@ -161,8 +147,6 @@
         <div class="main-menu-content">
             <h1>BİSMİL</h1>
             <div class="welcome-title">WELCOME TO BİSMİL</div>
-            <div id="user-display" class="user-welcome"></div>
-            
             <div class="hierarchy-title">KURUCU</div>
             <div class="kurucu-wrap">
                 <a href="https://www.instagram.com/yyoungtoven/" target="_blank" class="gang-link">
@@ -296,7 +280,7 @@
             
             currentUser = inputVal;
             
-            document.getElementById("user-display").innerText = currentUser; 
+            // ANA MENÜDEKİ YAZIYI GÜNCELLEYEN KODU SİLDİK
             document.getElementById("board-name-zed").innerText = currentUser;
             document.getElementById("board-name-aim").innerText = currentUser;
             document.getElementById("bj-player-name").innerText = currentUser;
